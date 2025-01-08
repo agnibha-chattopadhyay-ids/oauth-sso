@@ -1,48 +1,50 @@
-import { auth } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import { signOut } from "@/lib/auth";
+"use client";
 
-export default async function DashboardPage() {
-  const session = await auth();
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/ui/icons";
+
+export default function DashboardPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/login");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <Icons.spinner className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-            <p className="text-gray-600">
-              Welcome back, {session?.user?.name || "User"}
+    <div className="container flex h-screen w-screen flex-col items-center justify-center">
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+        <div className="flex flex-col space-y-2 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Welcome to Dashboard
+          </h1>
+          {session?.user?.email && (
+            <p className="text-sm text-muted-foreground">
+              Signed in as {session.user.email}
             </p>
-          </div>
-          <form
-            action={async () => {
-              "use server";
-              await signOut();
-            }}
-          >
-            <Button variant="outline">Sign out</Button>
-          </form>
+          )}
         </div>
-        <div className="grid gap-6">
-          <div className="p-6 bg-white rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-4">Profile Information</h2>
-            <div className="space-y-2">
-              <p>
-                <span className="font-medium">Name:</span>{" "}
-                {session?.user?.name || "Not provided"}
-              </p>
-              <p>
-                <span className="font-medium">Email:</span>{" "}
-                {session?.user?.email || "Not provided"}
-              </p>
-              <p>
-                <span className="font-medium">Role:</span>{" "}
-                {session?.user?.role || "USER"}
-              </p>
-            </div>
-          </div>
-        </div>
+        <Button
+          variant="outline"
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/" })}
+        >
+          <Icons.logout className="mr-2 h-4 w-4" />
+          Sign Out
+        </Button>
       </div>
     </div>
   );

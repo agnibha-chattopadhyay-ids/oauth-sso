@@ -1,10 +1,14 @@
-import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { withAuth } from "next-auth/middleware";
 
 export default withAuth(
-	function middleware(req) {
-		const isAuth = !!req.nextauth.token;
-		const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
+	async function middleware(req) {
+		const token = await getToken({ req });
+		const isAuth = !!token;
+		const isAuthPage =
+			req.nextUrl.pathname.startsWith("/auth/login") ||
+			req.nextUrl.pathname.startsWith("/auth/register");
 
 		if (isAuthPage) {
 			if (isAuth) {
@@ -14,13 +18,13 @@ export default withAuth(
 		}
 
 		if (!isAuth) {
-			let callbackUrl = req.nextUrl.pathname;
+			let from = req.nextUrl.pathname;
 			if (req.nextUrl.search) {
-				callbackUrl += req.nextUrl.search;
+				from += req.nextUrl.search;
 			}
-			const encodedCallbackUrl = encodeURIComponent(callbackUrl);
+
 			return NextResponse.redirect(
-				new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, req.url)
+				new URL(`/auth/login?callbackUrl=${encodeURIComponent(from)}`, req.url)
 			);
 		}
 	},
@@ -32,8 +36,5 @@ export default withAuth(
 );
 
 export const config = {
-	matcher: [
-		"/dashboard/:path*",
-		"/auth/:path*",
-	],
+	matcher: [ "/dashboard/:path*", "/auth/login", "/auth/register" ],
 }; 
