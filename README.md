@@ -1,20 +1,3 @@
-I'll help you create a comprehensive README.md for your Next.js authentication project. Here's a detailed documentation:
-
-```markdown:README.md
-# Next.js Authentication Demo
-
-A modern authentication system built with Next.js 14, MongoDB, Prisma, and NextAuth.js.
-
-## Features
-
-- 🔐 Authentication with NextAuth.js
-- 🚀 Google OAuth Integration
-- 👤 Custom Credentials Authentication
-- 📝 User Registration
-- 🔒 Protected Routes
-- 🎨 Modern UI with Tailwind CSS
-- 🔄 Type-safe with TypeScript
-- 🗄️ MongoDB Database with Prisma ORM
 
 ## Prerequisites
 
@@ -44,23 +27,18 @@ GOOGLE_CLIENT_SECRET="your_google_client_secret"
 
 ## Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/next-auth-demo.git
-cd next-auth-demo
-```
 
-2. Install dependencies:
+1. Install dependencies:
 ```bash
 pnpm install
 ```
 
-3. Generate Prisma client:
+1. Generate Prisma client:
 ```bash
 pnpm prisma generate
 ```
 
-4. Start the development server:
+1. Start the development server:
 ```bash
 pnpm dev
 ```
