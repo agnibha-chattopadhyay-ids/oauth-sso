@@ -1,60 +1,48 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { clientRegistry } from "@/lib/auth/clients";
+import type { AuthMethod } from "@/lib/auth/clients";
 import { toast } from "sonner";
-import { useLazyQuery } from "@apollo/client";
-import { GOOGLE_AUTH_URL } from "@/lib/graphql/auth.operations";
 
-export function LoginForm() {
+interface ClientSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
+  onClientSelect?: (clientId: string, method: AuthMethod) => void;
+}
+
+export function ClientSelector({ className, onClientSelect, ...props }: ClientSelectorProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = React.useState<string | null>(null);
 
-  // Get client ID from params or use default
-  const clientId = searchParams.get("client_id") || process.env.NEXT_PUBLIC_CLIENT_ID || "default";
-  const redirectUri = searchParams.get("redirect_uri");
-  const client = clientRegistry.getClient(clientId);
+  // Get only the default client
+  const defaultClient = clientRegistry.getClient(process.env.NEXT_PUBLIC_CLIENT_ID || 'default');
 
-  const [getGoogleAuthUrl] = useLazyQuery(GOOGLE_AUTH_URL);
-
-  const handleSelect = async (method: "credentials" | "google") => {
-    if (!client) {
-      toast.error("Invalid application configuration");
+  const handleSelect = async (method: AuthMethod) => {
+    if (!defaultClient) {
+      toast.error("Application configuration error");
       return;
     }
 
     try {
       setIsLoading(method);
       
-      if (method === "google") {
-        // Get Google auth URL from server
-        const { data, error } = await getGoogleAuthUrl({
-          variables: {
-            clientId,
-            redirectUri,
-          },
-        });
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        if (data?.googleAuthUrl) {
-          window.location.href = data.googleAuthUrl;
-        } else {
-          throw new Error("Failed to get authentication URL");
-        }
+      if (onClientSelect) {
+        await onClientSelect(defaultClient.clientId, method);
       } else {
-        // Handle credentials login
-        const params = new URLSearchParams({ client_id: clientId });
-        if (redirectUri) params.set("redirect_uri", redirectUri);
-        router.push(`/auth/login/credentials?${params.toString()}`);
+        const searchParams = new URLSearchParams();
+        searchParams.set("client_id", defaultClient.clientId);
+        
+        if (method === "google") {
+          router.push(`/auth/google?${searchParams.toString()}`);
+        } else {
+          searchParams.set("method", method);
+          router.push(`/auth/login?${searchParams.toString()}`);
+        }
       }
     } catch (error) {
       console.error("Auth selection error:", error);
@@ -64,7 +52,7 @@ export function LoginForm() {
     }
   };
 
-  if (!client) {
+  if (!defaultClient) {
     return null;
   }
 
@@ -88,7 +76,7 @@ export function LoginForm() {
         <Card className="border-2">
           <CardContent className="pt-6">
             <div className="grid gap-4">
-              {client.authMethods.includes("credentials") && (
+              {defaultClient.authMethods.includes("credentials") && (
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="outline"
@@ -107,7 +95,7 @@ export function LoginForm() {
                 </motion.div>
               )}
               
-              {client.authMethods.includes("google") && (
+              {defaultClient.authMethods.includes("google") && (
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="outline"

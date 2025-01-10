@@ -11,6 +11,8 @@ import {
   Users,
   Eye,
   EyeOff,
+  LogIn,
+  ArrowLeft,
 } from "lucide-react"
 
 import { GoogleIcon } from "@/components/ui/google-icon"
@@ -29,4 +31,6 @@ export const Icons = {
   users: Users,
   eye: Eye,
   eyeOff: EyeOff,
+  login: LogIn,
+  arrowLeft: ArrowLeft,
 } 

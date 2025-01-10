@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import AuthProvider from "@/components/providers/session-provider";
 import { Toaster } from "sonner";
+import { Providers } from "@/components/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Next.js Authentication Demo",
-  description: "A demo of Next.js authentication with MongoDB and NextAuth.js",
+  description: "A demo of Next.js authentication with GraphQL and Apollo Client",
 };
 
 export default function RootLayout({
@@ -19,10 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
+        <Providers>
           <main className="min-h-screen bg-gray-50">{children}</main>
-          <Toaster />
-        </AuthProvider>
+          <Toaster richColors position="top-center" />
+        </Providers>
       </body>
     </html>
   );

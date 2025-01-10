@@ -1,0 +1,63 @@
+use pnpm
+keep documentations in the README.md and update when necessary
+
+you can always add a section in .cursorrules when you need to add a new rule for more specific cases and context 
+
+
+# Project Type
+Next.js application with TypeScript and GraphQL authentication
+
+# Key Technologies
+- Next.js 14.1.0
+- TypeScript
+- Apollo Client for GraphQL
+- TailwindCSS
+- shadcn/ui components
+- React Hook Form
+- Zod for validation
+
+# Authentication Flow
+- Client ID based authentication
+- Token storage per client
+- Protected route handling
+- SSO capabilities
+
+# Security Requirements
+- CSRF protection
+- HTTP-only cookies
+- Rate limiting
+- Token refresh mechanism
+
+# Project Structure
+/src
+  /app                    # Next.js app router pages
+    /auth                # Auth-related pages
+    /dashboard           # Protected dashboard
+  /components            # React components
+    /auth               # Authentication components
+    /ui                 # UI components
+  /lib                   # Utilities and configurations
+    /apollo             # Apollo Client setup
+    /auth              # Authentication context
+    /graphql           # GraphQL operations
+
+# Authentication Methods
+- Google OAuth
+- Email/Password (GraphQL)
+
+# Key Features
+- Protected routes with middleware
+- Form validation
+- Dark/Light theme support
+- Custom UI components
+- Toast notifications
+- Password visibility toggle
+- Responsive design
+
+# Environment Variables Required
+NEXT_PUBLIC_GRAPHQL_URI
+NEXT_PUBLIC_CLIENT_ID
+NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
+# Package Manager
+pnpm
