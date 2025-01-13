@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
-import { clientRegistry } from "@/lib/auth/clients";
+import { getDapp } from "@/lib/auth/dapps";
 
 type IconType = keyof typeof Icons;
 
@@ -21,81 +21,41 @@ interface ErrorInfo {
 const ERROR_TYPES: Record<string, ErrorInfo> = {
   default: {
     title: "Authentication Error",
-    description: "An unexpected error occurred during authentication. Please try again.",
+    description: "An unexpected error occurred during authentication.",
     icon: "key",
     action: {
       label: "Try Again",
-      href: "/",
-    },
+      href: "/auth/login"
+    }
   },
-  invalid_client: {
-    title: "Invalid Client",
-    description: "The application requesting authentication is not registered or is invalid.",
-    icon: "key",
-    action: {
-      label: "Return Home",
-      href: "/",
-    },
-  },
-  invalid_request: {
-    title: "Invalid Request",
-    description: "The authentication request was malformed or missing required parameters.",
-    icon: "key",
-    action: {
-      label: "Try Again",
-      href: "/",
-    },
-  },
-  invalid_redirect_uri: {
-    title: "Invalid Redirect",
-    description: "The requested redirect URL is not allowed for this application.",
-    icon: "key",
-    action: {
-      label: "Return Home",
-      href: "/",
-    },
-  },
-  unauthorized: {
-    title: "Unauthorized",
-    description: "You are not authorized to access this resource.",
-    icon: "user",
-    action: {
-      label: "Sign In",
-      href: "/auth/login",
-    },
+  invalid_dapp: {
+    title: "Invalid Application",
+    description: "The requested application is not registered or is invalid.",
+    icon: "key"
   },
   rate_limited: {
     title: "Too Many Attempts",
-    description: "You have made too many attempts. Please try again later.",
-    icon: "spinner",
+    description: "Please wait before trying again.",
+    icon: "spinner"
   },
-  session_expired: {
-    title: "Session Expired",
-    description: "Your session has expired. Please sign in again.",
-    icon: "spinner",
-    action: {
-      label: "Sign In",
-      href: "/auth/login",
-    },
-  },
-  auth_failed: {
-    title: "Authentication Failed",
-    description: "Failed to authenticate with the selected provider.",
+  invalid_credentials: {
+    title: "Invalid Credentials",
+    description: "The provided credentials are incorrect.",
     icon: "key",
     action: {
       label: "Try Again",
-      href: "/",
-    },
+      href: "/auth/login"
+    }
   },
-  access_denied: {
-    title: "Access Denied",
-    description: "The authentication request was denied.",
-    icon: "key",
+  expired_token: {
+    title: "Session Expired",
+    description: "Your session has expired. Please sign in again.",
+    icon: "logout",
     action: {
-      label: "Return Home",
-      href: "/",
-    },
-  },
+      label: "Sign In",
+      href: "/auth/login"
+    }
+  }
 };
 
 export default function AuthErrorPage() {
@@ -105,18 +65,17 @@ export default function AuthErrorPage() {
 
   const error = searchParams.get("error") || "default";
   const errorDescription = searchParams.get("error_description");
-  const clientId = searchParams.get("client_id");
+  const dappId = searchParams.get("dapp_id");
   const retryAfter = searchParams.get("retry_after");
 
   const errorInfo = ERROR_TYPES[error] || ERROR_TYPES.default;
-  const client = clientId ? clientRegistry.getClient(clientId) : undefined;
+  const dapp = dappId ? getDapp(dappId) : undefined;
 
-  // Handle countdown for rate limiting
   useEffect(() => {
-    if (error === "rate_limited" && retryAfter) {
-      const retryTime = parseInt(retryAfter, 10);
-      if (!isNaN(retryTime)) {
-        setCountdown(retryTime);
+    if (retryAfter) {
+      const seconds = parseInt(retryAfter, 10);
+      if (!isNaN(seconds) && seconds > 0) {
+        setCountdown(seconds);
         const timer = setInterval(() => {
           setCountdown(prev => {
             if (prev === null || prev <= 1) {
@@ -129,59 +88,53 @@ export default function AuthErrorPage() {
         return () => clearInterval(timer);
       }
     }
-  }, [error, retryAfter]);
+  }, [retryAfter]);
 
-  const IconComponent = Icons[errorInfo.icon];
+  const handleAction = () => {
+    if (errorInfo.action) {
+      const url = new URL(errorInfo.action.href, window.location.origin);
+      if (dappId) {
+        url.searchParams.set("dapp_id", dappId);
+      }
+      router.push(url.toString());
+    }
+  };
+
+  const Icon = Icons[errorInfo.icon];
 
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
-          {client?.theme?.primaryColor && IconComponent && (
-            <div 
-              className="mx-auto mb-4 rounded-full p-3"
-              style={{ 
-                backgroundColor: `${client.theme.primaryColor}20`,
-                color: client.theme.primaryColor 
-              }}
-            >
-              <IconComponent className="h-6 w-6" />
-            </div>
-          )}
+          <Icon className="mx-auto h-12 w-12 text-destructive" />
           <h1 className="text-2xl font-semibold tracking-tight">
             {errorInfo.title}
           </h1>
           <p className="text-sm text-muted-foreground">
             {errorDescription || errorInfo.description}
+            {countdown !== null && ` (${countdown}s)`}
           </p>
-          {countdown !== null && (
-            <p className="text-sm font-medium text-muted-foreground">
-              Please try again in {countdown} seconds
-            </p>
-          )}
         </div>
 
-        {errorInfo.action && countdown === null && (
+        {errorInfo.action && (
           <Button
-            onClick={() => router.push(errorInfo.action!.href)}
-            style={client?.theme?.primaryColor ? {
-              backgroundColor: client.theme.primaryColor,
-              borderColor: client.theme.primaryColor,
-            } : undefined}
+            onClick={handleAction}
+            disabled={countdown !== null}
+            style={{ backgroundColor: dapp?.theme?.primaryColor }}
           >
             {errorInfo.action.label}
           </Button>
         )}
 
-        {client && (
+        {dapp && (
           <p className="px-8 text-center text-sm text-muted-foreground">
             Return to{" "}
             <a 
-              href={client.applicationUrl}
+              href={dapp.applicationUrl}
               className="underline hover:text-primary"
-              style={{ color: client.theme?.primaryColor }}
+              style={{ color: dapp.theme?.primaryColor }}
             >
-              {client.name}
+              {dapp.name}
             </a>
           </p>
         )}

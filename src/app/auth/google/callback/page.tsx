@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import { GOOGLE_AUTH_CALLBACK } from "@/lib/graphql/auth.operations";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { clientRegistry } from "@/lib/auth/clients";
+import { getDapp } from "@/lib/auth/dapps";
 import { toast } from "sonner";
 import { Icons } from "@/components/ui/icons";
 
@@ -16,14 +16,14 @@ export default function GoogleCallbackPage() {
   const [isProcessing, setIsProcessing] = React.useState(true);
 
   const code = searchParams.get("code");
-  const clientId = searchParams.get("state") || process.env.NEXT_PUBLIC_CLIENT_ID || "default";
-  const client = clientRegistry.getClient(clientId);
+  const dappId = searchParams.get("state") || process.env.NEXT_PUBLIC_DAPP_ID || "default";
+  const dapp = getDapp(dappId);
 
   const [googleCallback] = useMutation(GOOGLE_AUTH_CALLBACK);
 
   React.useEffect(() => {
     async function handleCallback() {
-      if (!code || !client) {
+      if (!code || !dapp) {
         toast.error("Invalid authentication response");
         router.push("/auth/login");
         return;
@@ -33,14 +33,14 @@ export default function GoogleCallbackPage() {
         const { data } = await googleCallback({
           variables: {
             code,
-            clientId,
+            dappId,
           },
         });
 
         if (data?.googleAuthCallback?.token) {
           toast.success("Successfully logged in with Google!");
-          login(data.googleAuthCallback.token, data.googleAuthCallback.refreshToken);
-          router.push(client.applicationUrl || "/dashboard");
+          login(data.googleAuthCallback.token);
+          router.push('/dashboard');
         } else {
           throw new Error("Failed to authenticate with Google");
         }
@@ -54,9 +54,9 @@ export default function GoogleCallbackPage() {
     }
 
     handleCallback();
-  }, [code, client, clientId, googleCallback, login, router]);
+  }, [code, dapp, dappId, googleCallback, login, router]);
 
-  if (!code || !client) {
+  if (!code || !dapp) {
     return null;
   }
 

@@ -7,23 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { clientRegistry } from "@/lib/auth/clients";
-import type { AuthMethod } from "@/lib/auth/clients";
+import { getDapp } from "@/lib/auth/dapps";
+import type { AuthMethod } from "@/lib/auth/dapps";
 import { toast } from "sonner";
 
-interface ClientSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
-  onClientSelect?: (clientId: string, method: AuthMethod) => void;
+interface DappSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
+  onDappSelect?: (dappId: string, method: AuthMethod) => void;
 }
 
-export function ClientSelector({ className, onClientSelect, ...props }: ClientSelectorProps) {
+export function DappSelector({ className, onDappSelect, ...props }: DappSelectorProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState<string | null>(null);
 
-  // Get only the default client
-  const defaultClient = clientRegistry.getClient(process.env.NEXT_PUBLIC_CLIENT_ID || 'default');
+  // Get only the default dapp
+  const defaultDapp = getDapp(process.env.NEXT_PUBLIC_DAPP_ID || 'default');
 
   const handleSelect = async (method: AuthMethod) => {
-    if (!defaultClient) {
+    if (!defaultDapp) {
       toast.error("Application configuration error");
       return;
     }
@@ -31,11 +31,11 @@ export function ClientSelector({ className, onClientSelect, ...props }: ClientSe
     try {
       setIsLoading(method);
       
-      if (onClientSelect) {
-        await onClientSelect(defaultClient.clientId, method);
+      if (onDappSelect) {
+        await onDappSelect(defaultDapp.dappId, method);
       } else {
         const searchParams = new URLSearchParams();
-        searchParams.set("client_id", defaultClient.clientId);
+        searchParams.set("dapp_id", defaultDapp.dappId);
         
         if (method === "google") {
           router.push(`/auth/google?${searchParams.toString()}`);
@@ -52,7 +52,7 @@ export function ClientSelector({ className, onClientSelect, ...props }: ClientSe
     }
   };
 
-  if (!defaultClient) {
+  if (!defaultDapp) {
     return null;
   }
 
@@ -76,7 +76,7 @@ export function ClientSelector({ className, onClientSelect, ...props }: ClientSe
         <Card className="border-2">
           <CardContent className="pt-6">
             <div className="grid gap-4">
-              {defaultClient.authMethods.includes("credentials") && (
+              {defaultDapp.authMethods.includes("credentials") && (
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="outline"
@@ -95,7 +95,7 @@ export function ClientSelector({ className, onClientSelect, ...props }: ClientSe
                 </motion.div>
               )}
               
-              {defaultClient.authMethods.includes("google") && (
+              {defaultDapp.authMethods.includes("google") && (
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="outline"

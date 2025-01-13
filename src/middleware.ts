@@ -1,133 +1,76 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { createTokenStore, isTokenExpired, parseToken } from '@/lib/auth/token';
-import { clientRegistry } from '@/lib/auth/clients';
+import { getDapp, DAPP_IDS } from '@/lib/auth/dapps';
+import { isTokenExpired } from '@/lib/auth/token';
 
-// Rate limiting configuration
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 100;
-const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
+// Add more specific auth-related paths
+const PUBLIC_PATHS = [
+	'/auth/login',
+	'/auth/register',
+	'/auth/error',
+	'/auth/callback/google',
+	'/auth/google',
+	'/auth/logout'
+];
 
-// Path configurations
-const authPaths = [ '/auth/login', '/auth/register', '/auth/callback' ];
-const publicPaths = [ '/', '/auth/error' ];
-
-function isAuthPath(pathname: string): boolean {
-	return authPaths.some(path => pathname.startsWith(path));
+function isPublicPath(path: string): boolean {
+	return (
+		PUBLIC_PATHS.includes(path) ||
+		path.startsWith('/_next') ||
+		path.startsWith('/api') ||
+		path.includes('/favicon.ico') ||
+		path.includes('.png') ||
+		path.includes('.jpg') ||
+		path.includes('.svg')
+	);
 }
 
-function isPublicPath(pathname: string): boolean {
-	return publicPaths.some(path => pathname.startsWith(path));
-}
+export function middleware(request: NextRequest) {
+	const path = request.nextUrl.pathname;
 
-// Rate limiting function
-function checkRateLimit(ip: string): boolean {
-	const now = Date.now();
-	const windowData = rateLimitMap.get(ip);
-
-	if (!windowData) {
-		rateLimitMap.set(ip, { count: 1, timestamp: now });
-		return true;
+	// Skip middleware for public paths
+	if (isPublicPath(path)) {
+		return NextResponse.next();
 	}
 
-	if (now - windowData.timestamp > RATE_LIMIT_WINDOW) {
-		rateLimitMap.set(ip, { count: 1, timestamp: now });
-		return true;
+	// Get dapp configuration
+	const dappId = request.headers.get('x-dapp-id') || process.env.NEXT_PUBLIC_DAPP_ID || DAPP_IDS.DEFAULT;
+	const dapp = getDapp(dappId);
+
+	if (!dapp) {
+		return NextResponse.redirect(new URL('/auth/error?error=invalid_dapp', request.url));
 	}
 
-	if (windowData.count >= MAX_REQUESTS) {
-		return false;
-	}
+	// Check for authentication token
+	const token = request.cookies.get('auth_token')?.value;
 
-	windowData.count++;
-	return true;
-}
+	// Handle authentication
+	if (!token || isTokenExpired(token)) {
+		const loginUrl = new URL('/auth/login', request.url);
+		loginUrl.searchParams.set('dapp_id', dappId);
+		loginUrl.searchParams.set('redirect_uri', path);
 
-// CSRF token validation
-function validateCsrfToken(request: NextRequest): boolean {
-	const csrfToken = request.headers.get('x-csrf-token');
-	const csrfCookie = request.cookies.get('csrf-token')?.value;
+		const response = NextResponse.redirect(loginUrl);
 
-	if (!csrfToken || !csrfCookie) {
-		return false;
-	}
-
-	return csrfToken === csrfCookie;
-}
-
-export async function middleware(request: NextRequest) {
-	const { pathname } = request.nextUrl;
-	const clientId = request.headers.get('x-client-id') ||
-		request.nextUrl.searchParams.get('client_id') ||
-		process.env.NEXT_PUBLIC_CLIENT_ID ||
-		'default';
-
-	// Check client validity
-	const client = clientRegistry.getClient(clientId);
-	if (!client) {
-		return NextResponse.redirect(new URL('/auth/error?error=invalid_client', request.url));
-	}
-
-	// Rate limiting
-	const ip = request.headers.get('x-forwarded-for')?.split(',')[ 0 ] || '';
-	if (!checkRateLimit(ip)) {
-		return new NextResponse('Too Many Requests', { status: 429 });
-	}
-
-	// CSRF protection for mutations
-	if (request.method !== 'GET' && request.method !== 'HEAD') {
-		if (!validateCsrfToken(request)) {
-			return new NextResponse('Invalid CSRF Token', { status: 403 });
-		}
-	}
-
-	// Get token from cookies
-	const tokenStore = createTokenStore(clientId);
-	const token = request.cookies.get(`auth_token_${clientId}`)?.value;
-
-	// Handle SSO authentication flow
-	if (isAuthPath(pathname)) {
-		// If user is already authenticated and has a valid token
-		if (token && !isTokenExpired(token)) {
-			const redirectUri = request.nextUrl.searchParams.get('redirect_uri');
-			if (redirectUri && client.allowedRedirectUrls.includes(redirectUri)) {
-				// Generate authorization code or token based on the flow
-				// For this example, we'll use the token directly
-				const searchParams = new URLSearchParams();
-				searchParams.set('access_token', token);
-				searchParams.set('token_type', 'Bearer');
-				return NextResponse.redirect(`${redirectUri}?${searchParams.toString()}`);
-			}
+		// Clear expired token if it exists
+		if (token) {
+			response.cookies.delete('auth_token');
 		}
 
-		// For login/register pages, validate redirect_uri
-		const redirectUri = request.nextUrl.searchParams.get('redirect_uri');
-		if (redirectUri && !client.allowedRedirectUrls.includes(redirectUri)) {
-			return NextResponse.redirect(new URL('/auth/error?error=invalid_redirect_uri', request.url));
-		}
+		return response;
 	}
 
-	// Set security headers
+	// Add security headers
 	const response = NextResponse.next();
 	response.headers.set('X-Frame-Options', 'DENY');
 	response.headers.set('X-Content-Type-Options', 'nosniff');
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 	response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
-	if (!isPublicPath(pathname)) {
-		response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-	}
-
 	return response;
 }
 
 export const config = {
 	matcher: [
-		// Match all auth-related routes
-		'/auth/:path*',
-		// Match all protected routes
-		'/dashboard/:path*',
-		'/profile/:path*',
-		// Match root page
-		'/'
-	]
+		'/((?!_next/static|_next/image|favicon.ico).*)',
+	],
 }; 

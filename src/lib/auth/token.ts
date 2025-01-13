@@ -4,20 +4,28 @@ export interface TokenStore {
 	getToken: () => string | null;
 	setToken: (token: string) => void;
 	removeToken: () => void;
-	getRefreshToken: () => string | null;
-	setRefreshToken: (token: string) => void;
 }
 
-export function createTokenStore(clientId: string): TokenStore {
-	const TOKEN_KEY = `auth_token_${clientId}`;
-	const REFRESH_TOKEN_KEY = `refresh_token_${clientId}`;
+export function createTokenStore(dappId: string): TokenStore {
+	const TOKEN_KEY = `auth_token_${dappId}`;
 
 	return {
-		getToken: () => getStorageItem(TOKEN_KEY),
-		setToken: (token: string) => setStorageItem(TOKEN_KEY, token),
-		removeToken: () => removeStorageItem(TOKEN_KEY),
-		getRefreshToken: () => getStorageItem(REFRESH_TOKEN_KEY),
-		setRefreshToken: (token: string) => setStorageItem(REFRESH_TOKEN_KEY, token),
+		getToken: () => {
+			if (typeof window === 'undefined') return null;
+			const cookie = document.cookie
+				.split(';')
+				.find(c => c.trim().startsWith(`${TOKEN_KEY}=`));
+			return cookie ? decodeURIComponent(cookie.split('=')[ 1 ]) : null;
+		},
+		setToken: (token: string) => {
+			if (typeof window === 'undefined') return;
+			const secure = window.location.protocol === 'https:';
+			document.cookie = `${TOKEN_KEY}=${encodeURIComponent(token)}; path=/; max-age=86400${secure ? '; secure' : ''}; samesite=strict`;
+		},
+		removeToken: () => {
+			if (typeof window === 'undefined') return;
+			document.cookie = `${TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+		},
 	};
 }
 

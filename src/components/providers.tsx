@@ -5,12 +5,12 @@ import { AuthProvider } from "@/lib/auth/AuthContext";
 import { getApolloClient } from "@/lib/apollo/client";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const clientId = process.env.NEXT_PUBLIC_CLIENT_ID || 'default';
-  const apolloClient = getApolloClient(clientId);
+  const dappId = process.env.NEXT_PUBLIC_DAPP_ID || 'default';
+  const apolloClient = getApolloClient(dappId);
 
   return (
     <ApolloProvider client={apolloClient}>
-      <AuthProvider clientId={clientId}>
+      <AuthProvider dappId={dappId}>
         {children}
       </AuthProvider>
     </ApolloProvider>
