@@ -54,14 +54,28 @@ pnpm dev
 ```
 src/
 ├── app/                    # Next.js app router pages
-│   └── auth/              # Authentication pages
+│   ├── auth/              # Authentication pages
+│   │   ├── google/        # Google OAuth flow
+│   │   ├── callback/      # Auth callbacks
+│   │   └── error/         # Error handling
+│   └── dashboard/         # Protected dashboard
 ├── components/            # React components
 │   ├── auth/             # Authentication components
+│   │   ├── login-form    # Login form
+│   │   ├── register-form # Registration form
+│   │   └── dapp-selector # Application selector
 │   └── ui/               # Shared UI components
+│       ├── animated      # Animation components
+│       ├── form         # Form elements
+│       └── loading      # Loading states
 ├── lib/                   # Utilities and configurations
-│   ├── auth/             # Auth context and config
-│   ├── graphql/          # GraphQL operations
-│   └── utils/            # Helper functions
+│   ├── auth/             # Authentication context & utils
+│   │   ├── dapps        # Dapp configurations
+│   │   └── token       # Token management
+│   ├── apollo/          # Apollo Client setup
+│   ├── graphql/         # GraphQL operations
+│   ├── types/          # TypeScript types
+│   └── utils/          # Helper utilities
 └── middleware.ts         # Auth middleware
 ```
 

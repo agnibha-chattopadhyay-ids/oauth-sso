@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { getDapp } from "@/lib/auth/dapps";
 import { toast } from "sonner";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GOOGLE_AUTH_URL, LOGIN_MUTATION } from "@/lib/graphql/auth.operations";
+import { GOOGLE_AUTH_URL, LOGIN_MUTATION } from "@/graphql/auth.operations";
 import { GlassCard } from "@/components/ui/glass-card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from '@/lib/auth/AuthContext';
+import { BrandIcon } from "@/components/ui/brand-icon";
 
 const loginSchema = z.object({
   email: z.string()
@@ -139,14 +140,18 @@ export function LoginForm() {
       transition={{ duration: 0.5 }}
       className="w-full max-w-[420px] space-y-6"
     >
+      {dapp?.theme?.brandIcon && (
+        <BrandIcon src={dapp.theme.brandIcon} />
+      )}
+
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Welcome Back</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-3xl font-bold tracking-tight text-white">Welcome Back</h1>
+        <p className="text-sm text-white/70">
           Choose how you want to sign in
         </p>
       </div>
 
-      <GlassCard>
+      <GlassCard className="bg-white/10 backdrop-blur-md border-white/20">
         <CardContent className="pt-6">
           <div className="grid gap-4">
             {dapp.authMethods.includes("credentials") && (
@@ -157,15 +162,16 @@ export function LoginForm() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel className="text-white/90">Email</FormLabel>
                         <FormControl>
                           <Input 
                             type="email"
                             placeholder="name@example.com"
+                            className="bg-white/10 text-white border-white/30 border-2 placeholder:text-white/60 focus:border-white/50 focus:ring-white/30"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
@@ -175,19 +181,20 @@ export function LoginForm() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel className="text-white/90">Password</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input 
                               type={showPassword ? "text" : "password"}
                               placeholder="••••••••"
+                              className="bg-white/10 text-white border-white/30 border-2 placeholder:text-white/60 focus:border-white/50 focus:ring-white/30"
                               {...field}
                             />
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="absolute right-2 top-1/2 -translate-y-1/2"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 text-white/70"
                               onClick={() => setShowPassword(!showPassword)}
                             >
                               {showPassword ? (
@@ -198,14 +205,14 @@ export function LoginForm() {
                             </Button>
                           </div>
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
 
                   <Button 
                     type="submit" 
-                    className="w-full"
+                    className="w-full bg-white text-dapp-background hover:bg-white/90 transition-colors"
                     disabled={isLoading === "credentials"}
                   >
                     {isLoading === "credentials" ? (
@@ -224,7 +231,7 @@ export function LoginForm() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full relative overflow-hidden bg-background/50 hover:bg-accent hover:text-accent-foreground"
+                  className="w-full relative overflow-hidden bg-white/10 hover:bg-white/20 text-white border-white/20"
                   onClick={handleGoogleAuth}
                   disabled={!!isLoading}
                 >
@@ -237,6 +244,17 @@ export function LoginForm() {
                 </Button>
               </motion.div>
             )}
+
+            <div className="text-center text-sm">
+              <span className="text-white/70">Don't have an account? </span>
+              <Button
+                variant="link"
+                className="text-white hover:text-white/90 p-0 h-auto font-semibold"
+                onClick={() => router.push(`/auth/register${window.location.search}`)}
+              >
+                Sign up
+              </Button>
+            </div>
           </div>
         </CardContent>
       </GlassCard>

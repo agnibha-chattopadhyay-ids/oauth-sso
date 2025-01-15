@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { useApolloClient } from '@apollo/client';
 import { createTokenStore } from './token';
 import { getDapp, DAPP_IDS } from './dapps';
-import { GET_USER } from '@/lib/graphql/auth.operations';
+import { GET_USER } from '@/graphql/auth.operations';
 
 interface User {
   id: string;

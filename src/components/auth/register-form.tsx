@@ -1,18 +1,22 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { getDapp } from "@/lib/auth/dapps";
 import { toast } from "sonner";
+import { useMutation } from "@apollo/client";
+import { REGISTER_MUTATION } from "@/graphql/auth.operations";
+import { GlassCard } from "@/components/ui/glass-card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMutation } from "@apollo/client";
-import { REGISTER_MUTATION } from "@/lib/graphql/auth.operations";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { BrandIcon } from "@/components/ui/brand-icon";
 
 const registerSchema = z.object({
   name: z.string()
@@ -34,12 +38,16 @@ const registerSchema = z.object({
 
 type RegisterFormInputs = z.infer<typeof registerSchema>;
 
-interface RegisterFormProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export function RegisterForm({ className, ...props }: RegisterFormProps) {
+export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [registerMutation] = useMutation(REGISTER_MUTATION);
+
+  const dappId = searchParams.get("dapp_id") || process.env.NEXT_PUBLIC_DAPP_ID || "default";
+  const redirectUri = searchParams.get("redirect_uri");
+  const dapp = getDapp(dappId);
 
   const form = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
@@ -52,6 +60,7 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
 
   const onSubmit = async (data: RegisterFormInputs) => {
     try {
+      setIsLoading(true);
       const response = await registerMutation({
         variables: {
           input: {
@@ -64,103 +73,163 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
 
       if (response.data?.register?.token) {
         toast.success("Account created successfully!");
-        router.push("/auth/login");
+        
+        // Handle redirect with token
+        if (redirectUri) {
+          try {
+            const redirectUrl = new URL(redirectUri);
+            // Check if the redirect URL's origin is allowed
+            if (dapp?.allowedRedirectUrls?.some(url => redirectUrl.origin === new URL(url).origin)) {
+              // Append token to the redirect URL
+              redirectUrl.searchParams.set('token', response.data.register.token);
+              window.location.href = redirectUrl.toString();
+              return;
+            }
+          } catch (e) {
+            console.error("Invalid redirect URL:", e);
+          }
+        }
+        // Default fallback
+        router.push(`/auth/login${window.location.search}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
-      toast.error("Failed to create account. Please try again.");
+      const errorMessage = error?.graphQLErrors?.[0]?.message || "Failed to create account. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (!dapp) {
+    return null;
+  }
+
   return (
-    <div className={cn("grid gap-6", className)} {...props}>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="John Doe"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-[420px] space-y-6"
+    >
+      {dapp?.theme?.brandIcon && (
+        <BrandIcon src={dapp.theme.brandIcon} />
+      )}
 
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="name@example.com"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <div className="flex flex-col space-y-2 text-center">
+        <h1 className="text-3xl font-bold tracking-tight text-dapp-foreground">Create an account</h1>
+        <p className="text-sm text-dapp-muted-foreground">
+          Enter your details below to create your account
+        </p>
+      </div>
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      {...field}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <Icons.eyeOff className="h-4 w-4" />
-                      ) : (
-                        <Icons.eye className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">
-                        {showPassword ? "Hide password" : "Show password"}
-                      </span>
-                    </Button>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <GlassCard className="bg-dapp-card/10 backdrop-blur-md border-dapp-border/20">
+        <CardContent className="pt-6">
+          <div className="grid gap-4">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-dapp-foreground/90">Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="John Doe"
+                          className="bg-dapp-input text-dapp-foreground border-dapp-border/30 border-2 placeholder:text-dapp-foreground/60 focus:border-dapp-border/50 focus:ring-dapp-ring/30"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
 
-          <Button 
-            type="submit"
-            className="w-full"
-            disabled={form.formState.isSubmitting}
-          >
-            {form.formState.isSubmitting ? (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Icons.userplus className="mr-2 h-4 w-4" />
-            )}
-            Create Account
-          </Button>
-        </form>
-      </Form>
-    </div>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-dapp-foreground/90">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="name@example.com"
+                          className="bg-dapp-input text-dapp-foreground border-dapp-border/30 border-2 placeholder:text-dapp-foreground/60 focus:border-dapp-border/50 focus:ring-dapp-ring/30"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-dapp-foreground/90">Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            className="bg-dapp-input text-dapp-foreground border-dapp-border/30 border-2 placeholder:text-dapp-foreground/60 focus:border-dapp-border/50 focus:ring-dapp-ring/30"
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-dapp-input/50 text-dapp-foreground/70"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <Icons.eyeOff className="h-4 w-4" />
+                            ) : (
+                              <Icons.eye className="h-4 w-4" />
+                            )}
+                            <span className="sr-only">
+                              {showPassword ? "Hide password" : "Show password"}
+                            </span>
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
+
+                <Button 
+                  type="submit"
+                  className="w-full bg-white hover:bg-white/90 text-dapp-background transition-colors"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Icons.userplus className="mr-2 h-4 w-4" />
+                  )}
+                  Create Account
+                </Button>
+
+                <div className="text-center text-sm">
+                  <span className="text-dapp-muted-foreground">Already have an account? </span>
+                  <Button
+                    variant="link"
+                    className="text-dapp-foreground hover:text-dapp-foreground/90 p-0 h-auto font-semibold"
+                    onClick={() => router.push(`/auth/login${window.location.search}`)}
+                  >
+                    Sign in
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </CardContent>
+      </GlassCard>
+    </motion.div>
   );
 } 

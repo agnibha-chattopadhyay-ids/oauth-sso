@@ -30,16 +30,31 @@ Next.js application with TypeScript and GraphQL authentication
 
 # Project Structure
 /src
-  /app                    # Next.js app router pages
-    /auth                # Auth-related pages
-    /dashboard           # Protected dashboard
-  /components            # React components
-    /auth               # Authentication components
-    /ui                 # UI components
-  /lib                   # Utilities and configurations
-    /apollo             # Apollo Client setup
-    /auth              # Authentication context
-    /graphql           # GraphQL operations
+  /context                # Context providers
+  /app                     # Next.js app router pages
+    /auth                 # Authentication pages
+      /google            # Google OAuth handling
+      /callback         # Auth callbacks
+      /error           # Error handling
+    /dashboard          # Protected dashboard
+  /components           # React components
+    /auth              # Authentication components
+      /login-form     # Login form component
+      /register-form  # Registration form
+      /dapp-selector # Application selector
+    /ui               # Shared UI components
+      /animated      # Animation components
+      /form         # Form elements
+      /loading     # Loading states
+  /lib                  # Utilities and configurations
+    /apollo            # Apollo Client setup
+    /auth             # Authentication context & utils
+      /dapps         # Dapp configurations
+      /token        # Token management
+    /graphql          # GraphQL operations
+    /types           # TypeScript types
+    /utils          # Helper utilities
+  /middleware.ts       # Auth middleware
 
 # Authentication Methods
 - Google OAuth
@@ -61,3 +76,11 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
 # Package Manager
 pnpm
+
+# Image Handling Rules
+- Place all static images in /public/logos directory
+- Use WebP format for brand logos for optimal performance
+- Provide fallback images in PNG format if needed
+- Image dimensions should be optimized for web (max 180px width for logos)
+- Use Next.js Image component with proper optimization settings
+- Handle loading and error states gracefully

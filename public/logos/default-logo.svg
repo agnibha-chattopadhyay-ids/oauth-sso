@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="180" height="60" viewBox="0 0 180 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rectangle with rounded corners -->
+  <rect width="180" height="60" rx="8" fill="#F3F4F6"/>
+  
+  <!-- App icon -->
+  <rect x="20" y="15" width="30" height="30" rx="6" fill="#6B7280"/>
+  <path d="M35 25L35 35M30 30H40" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Text -->
+  <text x="60" y="35" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#374151">
+    App Logo
+  </text>
+</svg> 

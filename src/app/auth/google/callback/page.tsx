@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@apollo/client";
-import { GOOGLE_AUTH_CALLBACK } from "@/lib/graphql/auth.operations";
+import { GOOGLE_AUTH_CALLBACK } from "@/graphql/auth.operations";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { getDapp } from "@/lib/auth/dapps";
 import { toast } from "sonner";

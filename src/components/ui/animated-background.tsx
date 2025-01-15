@@ -5,16 +5,20 @@ import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import { cn } from "@/lib/utils";
 import { motion, useAnimation } from "framer-motion";
+import { useTheme } from "@/context/themeContext";
 
 export const AnimatedBackground = ({
   className,
-  particleColor = "#000000",
+  dappId,
 }: {
   className?: string;
-  particleColor?: string;
+  dappId?: string | null;
 }) => {
   const [init, setInit] = useState(false);
   const controls = useAnimation();
+  const { getThemeConfig } = useTheme();
+  const themeConfig = getThemeConfig(dappId || undefined);
+  console.log(themeConfig);
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -46,15 +50,15 @@ export const AnimatedBackground = ({
           particlesLoaded={particlesLoaded}
           options={{
             background: {
-              color: "#ffffff",
+              color: themeConfig.backgroundColor,
             },
             fpsLimit: 60,
             particles: {
               color: {
-                value: particleColor,
+                value: themeConfig.particleColor,
               },
               links: {
-                color: particleColor,
+                color: themeConfig.particleColor,
                 distance: 150,
                 enable: true,
                 opacity: 0.4,

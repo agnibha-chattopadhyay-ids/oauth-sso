@@ -10,11 +10,12 @@ import { Icons } from "@/components/ui/icons";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { REGISTER_MUTATION } from "@/lib/graphql/auth.operations";
+import { REGISTER_MUTATION } from "@/graphql/auth.operations";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { getDapp } from "@/lib/auth/dapps";
 import { GlassCard } from "@/components/ui/glass-card";
 import Link from "next/link";
+import { BrandIcon } from "@/components/ui/brand-icon";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -86,20 +87,22 @@ export default function RegisterPage() {
       transition={{ duration: 0.5 }}
       className="w-full max-w-[420px] space-y-6"
     >
+      {dapp?.theme?.brandIcon && (
+        <BrandIcon src={dapp.theme.brandIcon} />
+      )}
+
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Create an account
-        </h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-3xl font-bold tracking-tight text-white">Create an account</h1>
+        <p className="text-sm text-white/70">
           Enter your details below to create your account
         </p>
       </div>
 
-      <GlassCard>
+      <GlassCard className="bg-white/10 backdrop-blur-md border-white/20">
         <CardContent className="pt-6">
           <form onSubmit={onSubmit} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name" className="text-white/90">Name</Label>
               <Input
                 id="name"
                 type="text"
@@ -109,12 +112,12 @@ export default function RegisterPage() {
                 autoCorrect="off"
                 disabled={isLoading}
                 required
-                className="bg-background/50"
+                className="bg-white/10 text-white border-white/30 border-2 placeholder:text-white/60 focus:border-white/50 focus:ring-white/30"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-white/90">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -124,12 +127,12 @@ export default function RegisterPage() {
                 autoCorrect="off"
                 disabled={isLoading}
                 required
-                className="bg-background/50"
+                className="bg-white/10 text-white border-white/30 border-2 placeholder:text-white/60 focus:border-white/50 focus:ring-white/30"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-white/90">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -138,13 +141,13 @@ export default function RegisterPage() {
                   autoComplete="new-password"
                   disabled={isLoading}
                   required
-                  className="bg-background/50"
+                  className="bg-white/10 text-white border-white/30 border-2 placeholder:text-white/60 focus:border-white/50 focus:ring-white/30"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 text-white/70"
                   onClick={togglePassword}
                   tabIndex={-1}
                 >
@@ -163,7 +166,7 @@ export default function RegisterPage() {
             <Button 
               disabled={isLoading} 
               type="submit" 
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="w-full bg-white text-dapp-background hover:bg-white/90 transition-colors"
             >
               {isLoading ? (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
@@ -175,22 +178,22 @@ export default function RegisterPage() {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4 pt-4">
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-white/70">
             Already have an account?{" "}
             <Link 
               href={{
-                pathname: "/auth/login/credentials",
+                pathname: "/auth/login",
                 query: { dapp_id: dappId, redirect_uri: redirectUri }
               }}
-              className="text-primary hover:underline font-medium"
+              className="text-white hover:text-white/90 font-medium"
             >
               Sign in
             </Link>
           </div>
           <Button
             variant="link"
-            className="text-sm text-muted-foreground hover:text-primary"
-            onClick={() => router.push("/auth/login")}
+            className="text-white/70 hover:text-white"
+            onClick={() => router.push(`/auth/login${window.location.search}`)}
           >
             <Icons.arrowLeft className="mr-2 h-4 w-4" />
             Back to login options
