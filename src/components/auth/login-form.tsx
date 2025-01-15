@@ -212,7 +212,7 @@ export function LoginForm() {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-white text-dapp-background hover:bg-white/90 transition-colors"
+                    className="w-full bg-primary text-primary-foreground hover:scale-[1.01] transition-all duration-300"
                     disabled={isLoading === "credentials"}
                   >
                     {isLoading === "credentials" ? (
@@ -231,7 +231,7 @@ export function LoginForm() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full relative overflow-hidden bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  className="w-full relative overflow-hidden bg-card hover:bg-card/80 text-card-foreground border-border/50"
                   onClick={handleGoogleAuth}
                   disabled={!!isLoading}
                 >
@@ -246,10 +246,10 @@ export function LoginForm() {
             )}
 
             <div className="text-center text-sm">
-              <span className="text-white/70">Don't have an account? </span>
+              <span className="text-muted-foreground">Don't have an account? </span>
               <Button
                 variant="link"
-                className="text-white hover:text-white/90 p-0 h-auto font-semibold"
+                className="text-foreground hover:text-foreground/90 p-0 h-auto font-semibold"
                 onClick={() => router.push(`/auth/register${window.location.search}`)}
               >
                 Sign up

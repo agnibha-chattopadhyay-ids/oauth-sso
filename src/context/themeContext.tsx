@@ -9,6 +9,21 @@ interface ThemeContextType {
     backgroundColor: string;
     primaryColor: string;
     particleColor: string;
+    foregroundColor: string;
+    cardColor: string;
+    cardForeground: string;
+    popoverColor: string;
+    popoverForeground: string;
+    primaryForeground: string;
+    secondaryColor: string;
+    secondaryForeground: string;
+    mutedColor: string;
+    mutedForeground: string;
+    accentColor: string;
+    accentForeground: string;
+    borderColor: string;
+    inputColor: string;
+    ringColor: string;
     title: string;
   };
 }
@@ -21,6 +36,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       backgroundColor: '#ffffff',
       primaryColor: '#0284c7',
       particleColor: '#000000',
+      foregroundColor: '#020817',
+      cardColor: '#ffffff',
+      cardForeground: '#020817',
+      popoverColor: '#ffffff',
+      popoverForeground: '#020817',
+      primaryForeground: '#ffffff',
+      secondaryColor: '#f1f5f9',
+      secondaryForeground: '#020817',
+      mutedColor: '#f1f5f9',
+      mutedForeground: '#64748b',
+      accentColor: '#f1f5f9',
+      accentForeground: '#020817',
+      borderColor: '#e2e8f0',
+      inputColor: 'rgba(0, 0, 0, 0.1)',
+      ringColor: 'rgba(2, 8, 23, 0.5)',
       title: 'Authentication'
     };
 
@@ -33,15 +63,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       backgroundColor: dappConfig.theme.backgroundColor || defaultConfig.backgroundColor,
       primaryColor: dappConfig.theme.primaryColor || defaultConfig.primaryColor,
       particleColor: dappConfig.theme.particleColor || defaultConfig.particleColor,
+      foregroundColor: dappConfig.theme.foregroundColor || defaultConfig.foregroundColor,
+      cardColor: dappConfig.theme.cardColor || defaultConfig.cardColor,
+      cardForeground: dappConfig.theme.cardForeground || defaultConfig.cardForeground,
+      popoverColor: dappConfig.theme.popoverColor || defaultConfig.popoverColor,
+      popoverForeground: dappConfig.theme.popoverForeground || defaultConfig.popoverForeground,
+      primaryForeground: dappConfig.theme.primaryForeground || defaultConfig.primaryForeground,
+      secondaryColor: dappConfig.theme.secondaryColor || defaultConfig.secondaryColor,
+      secondaryForeground: dappConfig.theme.secondaryForeground || defaultConfig.secondaryForeground,
+      mutedColor: dappConfig.theme.mutedColor || defaultConfig.mutedColor,
+      mutedForeground: dappConfig.theme.mutedForeground || defaultConfig.mutedForeground,
+      accentColor: dappConfig.theme.accentColor || defaultConfig.accentColor,
+      accentForeground: dappConfig.theme.accentForeground || defaultConfig.accentForeground,
+      borderColor: dappConfig.theme.borderColor || defaultConfig.borderColor,
+      inputColor: dappConfig.theme.inputColor || defaultConfig.inputColor,
+      ringColor: dappConfig.theme.ringColor || defaultConfig.ringColor,
       title: dappConfig.name || defaultConfig.title
     };
 
     // Set the theme CSS variables
-    setDappTheme({
-      backgroundColor: config.backgroundColor,
-      primaryColor: config.primaryColor,
-      particleColor: config.particleColor
-    });
+    setDappTheme(config);
 
     return config;
   };

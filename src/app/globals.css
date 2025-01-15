@@ -8,97 +8,97 @@ body {
 
 @layer base {
   :root {
-    /* Base shadcn variables */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Base shadcn variables - these will be dynamically set based on dapp theme */
+    --background: var(--dapp-background);
+    --foreground: var(--dapp-foreground);
+    --card: var(--dapp-card);
+    --card-foreground: var(--dapp-card-foreground);
+    --popover: var(--dapp-popover);
+    --popover-foreground: var(--dapp-popover-foreground);
+    --primary: var(--dapp-primary);
+    --primary-foreground: var(--dapp-primary-foreground);
+    --secondary: var(--dapp-secondary);
+    --secondary-foreground: var(--dapp-secondary-foreground);
+    --muted: var(--dapp-muted);
+    --muted-foreground: var(--dapp-muted-foreground);
+    --accent: var(--dapp-accent);
+    --accent-foreground: var(--dapp-accent-foreground);
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --border: var(--dapp-border);
+    --input: var(--dapp-input);
+    --ring: var(--dapp-ring);
     --radius: 0.5rem;
 
     /* Dapp theme variables */
-    --dapp-primary: var(--dapp-primary-color, #0284c7);
-    --dapp-background: var(--dapp-background-color, #ffffff);
-    --dapp-particle: var(--dapp-particle-color, #000000);
-    --dapp-foreground: var(--dapp-foreground-color, #020817);
-    --dapp-card: var(--dapp-card-color, #ffffff);
-    --dapp-card-foreground: var(--dapp-card-foreground-color, #020817);
-    --dapp-popover: var(--dapp-popover-color, #ffffff);
-    --dapp-popover-foreground: var(--dapp-popover-foreground-color, #020817);
-    --dapp-primary-foreground: var(--dapp-primary-foreground-color, #ffffff);
-    --dapp-secondary: var(--dapp-secondary-color, #f1f5f9);
-    --dapp-secondary-foreground: var(--dapp-secondary-foreground-color, #020817);
-    --dapp-muted: var(--dapp-muted-color, #f1f5f9);
-    --dapp-muted-foreground: var(--dapp-muted-foreground-color, #64748b);
-    --dapp-accent: var(--dapp-accent-color, #f1f5f9);
-    --dapp-accent-foreground: var(--dapp-accent-foreground-color, #020817);
-    --dapp-border: var(--dapp-border-color, #e2e8f0);
-    --dapp-input: var(--dapp-input-color, #e2e8f0);
-    --dapp-ring: var(--dapp-ring-color, #020817);
+    --dapp-primary: var(--dapp-primary-color, #FF8A3C);
+    --dapp-background: var(--dapp-background-color, #1A0B2E);
+    --dapp-particle: var(--dapp-particle-color, #ffffff);
+    --dapp-foreground: var(--dapp-foreground-color, #ffffff);
+    --dapp-card: var(--dapp-card-color, #2D1B4E);
+    --dapp-card-foreground: var(--dapp-card-foreground-color, #ffffff);
+    --dapp-popover: var(--dapp-popover-color, #2D1B4E);
+    --dapp-popover-foreground: var(--dapp-popover-foreground-color, #ffffff);
+    --dapp-primary-foreground: var(--dapp-primary-foreground-color, #1A0B2E);
+    --dapp-secondary: var(--dapp-secondary-color, #3B2064);
+    --dapp-secondary-foreground: var(--dapp-secondary-foreground-color, #ffffff);
+    --dapp-muted: var(--dapp-muted-color, #2D1B4E);
+    --dapp-muted-foreground: var(--dapp-muted-foreground-color, #9D94FF);
+    --dapp-accent: var(--dapp-accent-color, #FF8A3C);
+    --dapp-accent-foreground: var(--dapp-accent-foreground-color, #ffffff);
+    --dapp-border: var(--dapp-border-color, #3B2064);
+    --dapp-input: var(--dapp-input-color, rgba(255, 255, 255, 0.1));
+    --dapp-ring: var(--dapp-ring-color, #FF8A3C);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: var(--dapp-background);
+    --foreground: var(--dapp-foreground);
+    --card: var(--dapp-card);
+    --card-foreground: var(--dapp-card-foreground);
+    --popover: var(--dapp-popover);
+    --popover-foreground: var(--dapp-popover-foreground);
+    --primary: var(--dapp-primary);
+    --primary-foreground: var(--dapp-primary-foreground);
+    --secondary: var(--dapp-secondary);
+    --secondary-foreground: var(--dapp-secondary-foreground);
+    --muted: var(--dapp-muted);
+    --muted-foreground: var(--dapp-muted-foreground);
+    --accent: var(--dapp-accent);
+    --accent-foreground: var(--dapp-accent-foreground);
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --border: var(--dapp-border);
+    --input: var(--dapp-input);
+    --ring: var(--dapp-ring);
 
     /* Dapp theme variables - dark mode */
-    --dapp-primary: var(--dapp-primary-color, #0284c7);
-    --dapp-background: var(--dapp-background-color, #19064a);
+    --dapp-primary: var(--dapp-primary-color, #FF8A3C);
+    --dapp-background: var(--dapp-background-color, #1A0B2E);
     --dapp-particle: var(--dapp-particle-color, #ffffff);
     --dapp-foreground: var(--dapp-foreground-color, #ffffff);
-    --dapp-card: var(--dapp-card-color, #2a1163);
+    --dapp-card: var(--dapp-card-color, #2D1B4E);
     --dapp-card-foreground: var(--dapp-card-foreground-color, #ffffff);
-    --dapp-popover: var(--dapp-popover-color, #2a1163);
+    --dapp-popover: var(--dapp-popover-color, #2D1B4E);
     --dapp-popover-foreground: var(--dapp-popover-foreground-color, #ffffff);
-    --dapp-primary-foreground: var(--dapp-primary-foreground-color, #19064a);
-    --dapp-secondary: var(--dapp-secondary-color, #382179);
+    --dapp-primary-foreground: var(--dapp-primary-foreground-color, #1A0B2E);
+    --dapp-secondary: var(--dapp-secondary-color, #3B2064);
     --dapp-secondary-foreground: var(--dapp-secondary-foreground-color, #ffffff);
-    --dapp-muted: var(--dapp-muted-color, #382179);
-    --dapp-muted-foreground: var(--dapp-muted-foreground-color, #a599e9);
-    --dapp-accent: var(--dapp-accent-color, #382179);
+    --dapp-muted: var(--dapp-muted-color, #2D1B4E);
+    --dapp-muted-foreground: var(--dapp-muted-foreground-color, #9D94FF);
+    --dapp-accent: var(--dapp-accent-color, #FF8A3C);
     --dapp-accent-foreground: var(--dapp-accent-foreground-color, #ffffff);
-    --dapp-border: var(--dapp-border-color, #4c3190);
-    --dapp-input: var(--dapp-input-color, #4c3190);
-    --dapp-ring: var(--dapp-ring-color, #a599e9);
+    --dapp-border: var(--dapp-border-color, #3B2064);
+    --dapp-input: var(--dapp-input-color, rgba(255, 255, 255, 0.1));
+    --dapp-ring: var(--dapp-ring-color, #FF8A3C);
   }
 }
 
 @layer base {
   * {
-    @apply border-dapp-border;
+    @apply border-border;
   }
   body {
-    @apply bg-dapp-background text-[color:var(--dapp-foreground)];
+    @apply bg-background text-foreground;
   }
 }
