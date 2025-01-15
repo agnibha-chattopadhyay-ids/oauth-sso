@@ -84,3 +84,45 @@ pnpm
 - Image dimensions should be optimized for web (max 180px width for logos)
 - Use Next.js Image component with proper optimization settings
 - Handle loading and error states gracefully
+
+# Commit Message Conventions
+Format: <type>(<scope>): <subject>
+
+Types:
+- feat: New feature or enhancement
+- fix: Bug fix
+- refactor: Code refactoring without feature change
+- style: Code style/formatting changes
+- docs: Documentation changes
+- test: Adding or modifying tests
+- chore: Maintenance tasks, dependencies, etc.
+- perf: Performance improvements
+- ci: CI/CD related changes
+- revert: Revert previous changes
+
+Scope:
+- auth: Authentication related changes
+- ui: UI components and styling
+- api: API and GraphQL changes
+- types: TypeScript type definitions
+- deps: Dependency updates
+- config: Configuration changes
+- theme: Theme and styling system
+- test: Test-related changes
+- docs: Documentation updates
+
+Guidelines:
+- Subject line should be clear and concise (max 72 chars)
+- Use imperative mood ("Add" not "Added" or "Adds")
+- No period at the end of subject line
+- Provide detailed description in commit body if needed
+- Reference issues/PRs in commit body when applicable
+
+Examples:
+- feat(auth): add Google OAuth integration
+- fix(ui): resolve button color inconsistency in dark mode
+- refactor(api): optimize GraphQL query performance
+- style(theme): update color variables for better contrast
+- docs(readme): update installation instructions
+- test(auth): add unit tests for token refresh
+- chore(deps): update Next.js to v14.1.0
