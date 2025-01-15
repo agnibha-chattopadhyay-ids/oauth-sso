@@ -145,13 +145,13 @@ export function LoginForm() {
       )}
 
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Welcome Back</h1>
-        <p className="text-sm text-white/70">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome Back</h1>
+        <p className="text-sm text-muted-foreground">
           Choose how you want to sign in
         </p>
       </div>
 
-      <GlassCard className="bg-white/10 backdrop-blur-md border-white/20">
+      <GlassCard className="bg-card backdrop-blur-md border-border">
         <CardContent className="pt-6">
           <div className="grid gap-4">
             {dapp.authMethods.includes("credentials") && (
@@ -162,16 +162,16 @@ export function LoginForm() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white/90">Email</FormLabel>
+                        <FormLabel className="text-foreground/90">Email</FormLabel>
                         <FormControl>
                           <Input 
                             type="email"
                             placeholder="name@example.com"
-                            className="bg-white/10 text-white border-white/30 border-2 placeholder:text-white/60 focus:border-white/50 focus:ring-white/30"
+                            className="bg-input text-foreground border-border/30 border-2 placeholder:text-muted-foreground focus:border-border/50 focus:ring-ring/30"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="text-red-400" />
+                        <FormMessage className="text-destructive" />
                       </FormItem>
                     )}
                   />
@@ -181,20 +181,20 @@ export function LoginForm() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white/90">Password</FormLabel>
+                        <FormLabel className="text-foreground/90">Password</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input 
                               type={showPassword ? "text" : "password"}
                               placeholder="••••••••"
-                              className="bg-white/10 text-white border-white/30 border-2 placeholder:text-white/60 focus:border-white/50 focus:ring-white/30"
+                              className="bg-input text-foreground border-border/30 border-2 placeholder:text-muted-foreground focus:border-border/50 focus:ring-ring/30"
                               {...field}
                             />
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 text-white/70"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-input text-foreground/70"
                               onClick={() => setShowPassword(!showPassword)}
                             >
                               {showPassword ? (
@@ -205,14 +205,14 @@ export function LoginForm() {
                             </Button>
                           </div>
                         </FormControl>
-                        <FormMessage className="text-red-400" />
+                        <FormMessage className="text-destructive" />
                       </FormItem>
                     )}
                   />
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-primary text-primary-foreground hover:scale-[1.01] transition-all duration-300"
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.01] transition-all duration-300"
                     disabled={isLoading === "credentials"}
                   >
                     {isLoading === "credentials" ? (
