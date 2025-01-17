@@ -43,21 +43,27 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       popoverForeground: '#020817',
       primaryForeground: '#ffffff',
       secondaryColor: '#f1f5f9',
-      secondaryForeground: '#020817',
+      secondaryForeground: '#0f172a',
       mutedColor: '#f1f5f9',
-      mutedForeground: '#64748b',
+      mutedForeground: '#475569',
       accentColor: '#f1f5f9',
-      accentForeground: '#020817',
+      accentForeground: '#0f172a',
       borderColor: '#e2e8f0',
       inputColor: 'rgba(0, 0, 0, 0.1)',
-      ringColor: 'rgba(2, 8, 23, 0.5)',
+      ringColor: 'rgba(2, 132, 199, 0.5)',
       title: 'Authentication'
     };
 
-    if (!dappId) return defaultConfig;
+    if (!dappId) {
+      setDappTheme(defaultConfig);
+      return defaultConfig;
+    }
 
     const dappConfig = getDapp(dappId);
-    if (!dappConfig?.theme) return defaultConfig;
+    if (!dappConfig?.theme) {
+      setDappTheme(defaultConfig);
+      return defaultConfig;
+    }
 
     const config = {
       backgroundColor: dappConfig.theme.backgroundColor || defaultConfig.backgroundColor,
@@ -81,15 +87,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       title: dappConfig.name || defaultConfig.title
     };
 
-    // Set the theme CSS variables
     setDappTheme(config);
-
     return config;
   };
 
   // Set default theme on mount
   useEffect(() => {
-    getThemeConfig();
+    const defaultConfig = getThemeConfig();
+    setDappTheme(defaultConfig);
   }, []);
 
   return (
