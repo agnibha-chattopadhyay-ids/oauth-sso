@@ -6,27 +6,38 @@ import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
 import { AnimatedBackground } from "@/components/ui/animated-background";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
+
+function MainContent({ children }: { children: React.ReactNode }) {
+  const searchParams = useSearchParams();
+  const dapp_id = searchParams.get('dapp_id');
+
+  return (
+    <main className="relative flex min-h-screen flex-col">
+      <AnimatedBackground dappId={dapp_id} />
+      <div className="flex flex-1 items-center justify-center p-4">
+        <Suspense fallback={<div>Loading...</div>}>
+          {children}
+        </Suspense>
+      </div>
+    </main>
+  );
+}
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const searchParams = useSearchParams();
-  const dapp_id = searchParams.get('dapp_id');
-
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.className} h-full`}>
         <Providers>
-          <AnimatedBackground dappId={dapp_id} />
-          <main className="relative flex min-h-screen flex-col">
-            <div className="flex flex-1 items-center justify-center p-4">
-              {children}
-            </div>
-          </main>
+          <Suspense fallback={<div>Loading...</div>}>
+            <MainContent>{children}</MainContent>
+          </Suspense>
           <Toaster richColors position="top-center" />
         </Providers>
       </body>

@@ -88,17 +88,17 @@ const dappConfigs: Record<string, DappConfig> = {
 			cardForeground: '#ffffff',
 			popoverColor: '#2D1B4E',
 			popoverForeground: '#ffffff',
-			primaryForeground: '#1A0B2E',
+			primaryForeground: '#ffffff',
 			secondaryColor: '#3B2064',
 			secondaryForeground: '#ffffff',
 			mutedColor: '#2D1B4E',
-			mutedForeground: '#9D94FF',
+			mutedForeground: '#ffffff',
 			accentColor: '#FF5F1F',
 			accentForeground: '#ffffff',
 			borderColor: '#df7c41',
 			inputColor: 'rgba(255, 255, 255, 0.1)',
 			ringColor: '#FF5F1F',
-			brandIcon: "/logos/ids-dark-logo.png"
+			brandIcon: "/logos/bon-light.png"
 		}
 	},
 };

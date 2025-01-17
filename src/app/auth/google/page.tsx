@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { clientRegistry } from "@/lib/auth/clients";
+import { getDapp } from "@/lib/auth/dapps";
 
 export default function GoogleAuthPage() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export default function GoogleAuthPage() {
     const redirectUri = searchParams.get("redirect_uri");
 
     // Get client configuration
-    const client = clientRegistry.getClient(clientId);
+    const client = getDapp(clientId);
     if (!client) {
       router.push("/auth/error?error=invalid_client");
       return;

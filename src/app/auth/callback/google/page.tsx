@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import { GOOGLE_AUTH_CALLBACK } from "@/graphql/auth.operations";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { clientRegistry } from "@/lib/auth/clients";
+import { getDapp } from "@/lib/auth/dapps";
 import { toast } from "sonner";
 
 export default function GoogleCallbackPage() {
@@ -23,7 +23,7 @@ export default function GoogleCallbackPage() {
       const redirectUri = searchParams.get("redirect_uri");
 
       // Get client configuration
-      const client = clientRegistry.getClient(clientId);
+      const client = getDapp(clientId);
       if (!client) {
         router.push("/auth/error?error=invalid_client");
         return;
@@ -54,7 +54,7 @@ export default function GoogleCallbackPage() {
 
         if (data?.googleCallback?.token) {
           toast.success("Successfully logged in with Google!");
-          login(data.googleCallback.token, data.googleCallback.refreshToken);
+          login(data.googleCallback.token);
 
           // Handle redirect based on client configuration
           if (redirectUri && client.allowedRedirectUrls.includes(redirectUri)) {
